@@ -1,0 +1,793 @@
+<Sysmon schemaversion="4.90">
+  <HashAlgorithms>SHA256</HashAlgorithms>
+  <CheckRevocation>False</CheckRevocation>
+  <DnsLookup>False</DnsLookup>
+  <ArchiveDirectory>Sysmon</ArchiveDirectory>
+
+  <EventFiltering>
+
+    <!-- ================================================================= -->
+    <!-- EVENT 1 – PROCESS CREATION (Tier 1 & 2 detections)                -->
+    <!-- ================================================================= -->
+
+    <!-- EXCLUDE: High-volume, low-value noise (Tier 3 telemetry) -->
+    <RuleGroup groupRelation="or">
+      <ProcessCreate onmatch="exclude">
+        <Rule groupRelation="or">
+          <!-- Browser main processes (subprocesses still logged) -->
+          <Image condition="end with">\chrome.exe</Image>
+          <Image condition="end with">\msedge.exe</Image>
+          <Image condition="end with">\firefox.exe</Image>
+          <Image condition="end with">\brave.exe</Image>
+          <!-- Enterprise productivity (benign, high volume) -->
+          <Image condition="end with">\OneDrive.exe</Image>
+          <Image condition="end with">\Teams.exe</Image>
+          <Image condition="end with">\Dropbox.exe</Image>
+          <Image condition="contains">\Google\Update\</Image>
+          <!-- Adobe Reader noise -->
+          <Image condition="contains">\Adobe\Acrobat</Image>
+          <CommandLine condition="begin with">"C:\Program Files (x86)\Adobe\Acrobat Reader DC\Reader\AcroCEF\RdrCEF.exe"</CommandLine>
+          <!-- Windows internal system processes -->
+          <Image condition="is">C:\Windows\System32\conhost.exe</Image>
+          <Image condition="is">C:\Windows\System32\audiodg.exe</Image>
+          <Image condition="is">C:\Windows\System32\sppsvc.exe</Image>
+          <Image condition="is">C:\Windows\System32\wbem\WmiPrvSE.exe</Image>
+          <Image condition="is">C:\Windows\System32\CompatTelRunner.exe</Image>
+          <Image condition="is">C:\Windows\System32\MusNotification.exe</Image>
+          <Image condition="is">C:\Windows\System32\MusNotificationUx.exe</Image>
+          <Image condition="begin with">C:\Windows\System32\svchost.exe</Image>
+          <IntegrityLevel condition="is">AppContainer</IntegrityLevel>
+          <!-- .NET NGEN (high volume, benign) -->
+          <CommandLine condition="begin with">C:\Windows\Microsoft.NET\Framework\v4.0.30319\ngen.exe</CommandLine>
+          <CommandLine condition="begin with">C:\Windows\Microsoft.NET\Framework64\v4.0.30319\ngen.exe</CommandLine>
+          <Image condition="is">C:\Windows\Microsoft.NET\Framework64\v4.0.30319\mscorsvw.exe</Image>
+          <Image condition="is">C:\Windows\Microsoft.NET\Framework\v4.0.30319\mscorsvw.exe</Image>
+          <!-- Windows Update -->
+          <Image condition="is">C:\Windows\System32\wuauclt.exe</Image>
+          <CommandLine condition="begin with">C:\Windows\system32\DllHost.exe /Processid</CommandLine>
+          <CommandLine condition="is">C:\Windows\system32\SearchIndexer.exe /Embedding</CommandLine>
+          <!-- Monitoring agents (allowlist) -->
+          <Image condition="contains">\Wazuh\</Image>
+          <Image condition="contains">\SentinelOne\</Image>
+          <Image condition="contains">\CrowdStrike\</Image>
+          <Image condition="contains">\CarbonBlack\</Image>
+          <Image condition="contains">C:\Program Files\Microsoft Monitoring Agent</Image>
+          <Image condition="contains">C:\Program Files\Splunk</Image>
+          <Image condition="contains">C:\Program Files\Elastic\Agent</Image>
+        </Rule>
+      </ProcessCreate>
+    </RuleGroup>
+
+    <!-- INCLUDE: Suspicious process creations (Tier 1 & 2) -->
+    <RuleGroup groupRelation="or">
+      <ProcessCreate onmatch="include">
+        <Rule groupRelation="or">
+          <!-- Tier 1: Critical threats -->
+          <!-- COMsvcs MiniDump (credential dumping) -->
+          <Rule groupRelation="and">
+            <Image condition="end with">\rundll32.exe</Image>
+            <CommandLine condition="contains">comsvcs.dll</CommandLine>
+            <CommandLine condition="contains">MiniDump</CommandLine>
+          </Rule>
+          <!-- Ransomware – shadow copy deletion -->
+          <Rule groupRelation="and">
+            <Image condition="end with">\vssadmin.exe</Image>
+            <CommandLine condition="contains">delete</CommandLine>
+          </Rule>
+          <Rule groupRelation="and">
+            <Image condition="end with">\wbadmin.exe</Image>
+            <CommandLine condition="contains">delete</CommandLine>
+          </Rule>
+          <Rule groupRelation="and">
+            <Image condition="end with">\bcdedit.exe</Image>
+            <CommandLine condition="contains">/set</CommandLine>
+          </Rule>
+          <!-- Defender tampering -->
+          <Rule groupRelation="and">
+            <CommandLine condition="contains">Set-MpPreference</CommandLine>
+            <Rule groupRelation="or">
+              <CommandLine condition="contains">-DisableRealtimeMonitoring</CommandLine>
+              <CommandLine condition="contains">-DisableBehaviorMonitoring</CommandLine>
+              <CommandLine condition="contains">-DisableIOAVProtection</CommandLine>
+            </Rule>
+          </Rule>
+          <Rule groupRelation="and">
+            <Image condition="end with">\MpCmdRun.exe</Image>
+            <CommandLine condition="contains">Add-MpPreference</CommandLine>
+          </Rule>
+          <!-- UAC bypass -->
+          <ParentImage condition="end with">\eventvwr.exe</ParentImage>
+          <ParentImage condition="end with">\fodhelper.exe</ParentImage>
+          <ParentImage condition="end with">\computerdefaults.exe</ParentImage>
+          <ParentImage condition="end with">\dism.exe</ParentImage>
+          <Image condition="end with">\WSReset.exe</Image>
+          <Image condition="end with">\xwizard.exe</Image>
+          <!-- Process injection (mavinject) -->
+          <Rule groupRelation="and">
+            <Image condition="contains">\mavinject</Image>
+            <CommandLine condition="contains">/INJECTRUNNING</CommandLine>
+          </Rule>
+          <!-- Remote execution (WinRM, PsExec) -->
+          <Image condition="end with">\wsmprovhost.exe</Image>
+          <Image condition="end with">\winrshost.exe</Image>
+          <Image condition="end with">\psexec.exe</Image>
+          <Image condition="end with">\winrs.exe</Image>
+
+          <!-- Tier 2: Suspicious behavior (correlate in Wazuh) -->
+          <!-- Encoded PowerShell / obfuscation -->
+          <CommandLine condition="contains">-enc</CommandLine>
+          <CommandLine condition="contains">-EncodedCommand</CommandLine>
+          <CommandLine condition="contains">FromBase64String</CommandLine>
+          <!-- LOLBins execution from any path -->
+          <Image condition="end with">\powershell.exe</Image>
+          <Image condition="end with">\pwsh.exe</Image>
+          <Image condition="end with">\cmd.exe</Image>
+          <Image condition="end with">\rundll32.exe</Image>
+          <Image condition="end with">\mshta.exe</Image>
+          <Image condition="end with">\regsvr32.exe</Image>
+          <Image condition="end with">\wmic.exe</Image>
+          <Image condition="end with">\certutil.exe</Image>
+          <Image condition="end with">\bitsadmin.exe</Image>
+          <Image condition="end with">\curl.exe</Image>
+          <Image condition="end with">\schtasks.exe</Image>
+          <!-- Office child processes (macro execution) -->
+          <ParentImage condition="end with">\WINWORD.EXE</ParentImage>
+          <ParentImage condition="end with">\EXCEL.EXE</ParentImage>
+          <ParentImage condition="end with">\POWERPNT.EXE</ParentImage>
+          <ParentImage condition="end with">\OUTLOOK.EXE</ParentImage>
+          <!-- Execution from suspicious directories (Tier 2) -->
+          <Rule groupRelation="and">
+            <Rule groupRelation="or">
+              <Image condition="begin with">C:\Windows\Temp\</Image>
+              <Image condition="begin with">C:\Temp\</Image>
+              <Image condition="contains">\AppData\Local\Temp\</Image>
+              <Image condition="contains">\Downloads\</Image>
+              <Image condition="begin with">C:\Users\Public\</Image>
+              <Image condition="begin with">C:\PerfLogs\</Image>
+            </Rule>
+            <Rule groupRelation="or">
+              <Image condition="end with">.exe</Image>
+              <Image condition="end with">.scr</Image>
+              <Image condition="end with">.com</Image>
+              <Image condition="end with">.pif</Image>
+              <Image condition="end with">.dll</Image>
+            </Rule>
+          </Rule>
+        </Rule>
+      </ProcessCreate>
+    </RuleGroup>
+
+    <!-- ================================================================= -->
+    <!-- EVENT 3 – NETWORK CONNECTION (HARDENED v6.1)                      -->
+    <!-- ================================================================= -->
+
+    <!-- EXCLUDE: Benign processes and internal IP ranges -->
+    <RuleGroup groupRelation="or">
+      <NetworkConnect onmatch="exclude">
+        <Rule groupRelation="or">
+          <Image condition="end with">\chrome.exe</Image>
+          <Image condition="end with">\msedge.exe</Image>
+          <Image condition="end with">\firefox.exe</Image>
+          <Image condition="end with">\brave.exe</Image>
+          <Image condition="end with">\svchost.exe</Image>
+          <Image condition="end with">\OneDrive.exe</Image>
+          <Image condition="end with">\Teams.exe</Image>
+          <Image condition="end with">\Dropbox.exe</Image>
+          <Image condition="end with">\Spotify.exe</Image>
+          <!-- Internal IP ranges (prevent log flood) -->
+          <DestinationIp condition="begin with">10.</DestinationIp>
+          <DestinationIp condition="begin with">172.16.</DestinationIp>
+          <DestinationIp condition="begin with">192.168.</DestinationIp>
+          <DestinationIp condition="is">127.0.0.1</DestinationIp>
+          <DestinationIp condition="is">::1</DestinationIp>
+          <!-- Microsoft telemetry / updates -->
+          <DestinationHostname condition="end with">.microsoft.com</DestinationHostname>
+          <DestinationHostname condition="end with">.windowsupdate.com</DestinationHostname>
+          <DestinationHostname condition="end with">.azure.com</DestinationHostname>
+        </Rule>
+      </NetworkConnect>
+    </RuleGroup>
+
+    <!-- INCLUDE: Suspicious network activity (Tier 1 & 2) -->
+    <RuleGroup groupRelation="or">
+      <NetworkConnect onmatch="include">
+        <Rule groupRelation="or">
+          <!-- Tier 1: C2 / reverse shell ports -->
+          <DestinationPort condition="is">4444</DestinationPort>
+          <DestinationPort condition="is">5555</DestinationPort>
+          <DestinationPort condition="is">6666</DestinationPort>
+          <DestinationPort condition="is">6667</DestinationPort>
+          <DestinationPort condition="is">31337</DestinationPort>
+          <DestinationPort condition="is">9001</DestinationPort>
+          <DestinationPort condition="is">9030</DestinationPort>
+          <DestinationPort condition="is">1337</DestinationPort>
+          <DestinationPort condition="is">9050</DestinationPort>
+
+          <!-- Tier 1: Lateral movement ports -->
+          <DestinationPort condition="is">3389</DestinationPort>   <!-- RDP -->
+          <DestinationPort condition="is">445</DestinationPort>    <!-- SMB -->
+          <DestinationPort condition="is">5985</DestinationPort>   <!-- WinRM HTTP -->
+          <DestinationPort condition="is">5986</DestinationPort>   <!-- WinRM HTTPS -->
+          <DestinationPort condition="is">22</DestinationPort>     <!-- SSH (if non-OpenSSH) -->
+          <DestinationPort condition="is">23</DestinationPort>     <!-- Telnet -->
+
+          <!-- Tier 2: LOLBins making outbound connections -->
+          <Image condition="end with">\powershell.exe</Image>
+          <Image condition="end with">\pwsh.exe</Image>
+          <Image condition="end with">\mshta.exe</Image>
+          <Image condition="end with">\rundll32.exe</Image>
+          <Image condition="end with">\wscript.exe</Image>
+          <Image condition="end with">\cscript.exe</Image>
+          <Image condition="end with">\certutil.exe</Image>
+          <Image condition="end with">\bitsadmin.exe</Image>
+          <Image condition="end with">\curl.exe</Image>
+          <Image condition="end with">\wmic.exe</Image>
+          <Image condition="end with">\regsvr32.exe</Image>
+          <Image condition="end with">\msiexec.exe</Image>
+
+          <!-- Tier 2: Execution from suspicious directories (any outbound) -->
+          <Image condition="begin with">C:\Windows\Temp\</Image>
+          <Image condition="begin with">C:\Temp\</Image>
+          <Image condition="begin with">C:\Users\Public\</Image>
+          <Image condition="begin with">C:\PerfLogs\</Image>
+          <Image condition="contains">\AppData\Local\Temp\</Image>
+          <Image condition="contains">\Downloads\</Image>
+        </Rule>
+      </NetworkConnect>
+    </RuleGroup>
+
+    <!-- ================================================================= -->
+    <!-- EVENT 5 – PROCESS TERMINATION (Tier 1 critical processes only)    -->
+    <!-- ================================================================= -->
+    <RuleGroup groupRelation="or">
+      <ProcessTerminate onmatch="include">
+        <Rule groupRelation="or">
+          <Image condition="end with">\lsass.exe</Image>
+          <Image condition="end with">\MsMpEng.exe</Image>
+          <Image condition="end with">\Sysmon.exe</Image>
+          <Image condition="end with">\Sysmon64.exe</Image>
+          <Image condition="end with">\winlogon.exe</Image>
+          <Image condition="end with">\services.exe</Image>
+          <Image condition="end with">\csrss.exe</Image>
+        </Rule>
+      </ProcessTerminate>
+    </RuleGroup>
+
+    <!-- ================================================================= -->
+    <!-- EVENT 6 – DRIVER LOAD (Tier 1 – BYOVD detection)                  -->
+    <!-- ================================================================= -->
+    <RuleGroup groupRelation="or">
+      <DriverLoad onmatch="exclude">
+        <Rule groupRelation="or">
+          <!-- Trusted hardware vendors (valid signatures) -->
+          <Rule groupRelation="and">
+            <Signature condition="contains">Microsoft</Signature>
+            <SignatureStatus condition="is">Valid</SignatureStatus>
+          </Rule>
+          <Rule groupRelation="and">
+            <Signature condition="begin with">Intel Corporation</Signature>
+            <SignatureStatus condition="is">Valid</SignatureStatus>
+          </Rule>
+          <Rule groupRelation="and">
+            <Signature condition="begin with">Advanced Micro Devices</Signature>
+            <SignatureStatus condition="is">Valid</SignatureStatus>
+          </Rule>
+          <Rule groupRelation="and">
+            <Signature condition="begin with">Realtek Semiconductor Corp.</Signature>
+            <SignatureStatus condition="is">Valid</SignatureStatus>
+          </Rule>
+          <Rule groupRelation="and">
+            <Signature condition="begin with">VMware, Inc.</Signature>
+            <SignatureStatus condition="is">Valid</SignatureStatus>
+          </Rule>
+          <Rule groupRelation="and">
+            <Signature condition="begin with">Dell Inc.</Signature>
+            <SignatureStatus condition="is">Valid</SignatureStatus>
+          </Rule>
+          <Rule groupRelation="and">
+            <Signature condition="begin with">Hewlett-Packard</Signature>
+            <SignatureStatus condition="is">Valid</SignatureStatus>
+          </Rule>
+          <Rule groupRelation="and">
+            <Signature condition="begin with">Lenovo</Signature>
+            <SignatureStatus condition="is">Valid</SignatureStatus>
+          </Rule>
+          <Rule groupRelation="and">
+            <Signature condition="begin with">Cisco Systems</Signature>
+            <SignatureStatus condition="is">Valid</SignatureStatus>
+          </Rule>
+          <Rule groupRelation="and">
+            <Signature condition="begin with">Broadcom</Signature>
+            <SignatureStatus condition="is">Valid</SignatureStatus>
+          </Rule>
+          <Rule groupRelation="and">
+            <Signature condition="begin with">NVIDIA Corporation</Signature>
+            <SignatureStatus condition="is">Valid</SignatureStatus>
+          </Rule>
+          <Rule groupRelation="and">
+            <Signature condition="begin with">Citrix Systems, Inc.</Signature>
+            <SignatureStatus condition="is">Valid</SignatureStatus>
+          </Rule>
+        </Rule>
+      </DriverLoad>
+    </RuleGroup>
+    <!-- Log all other drivers (unsigned, untrusted) -->
+    <RuleGroup groupRelation="or">
+      <DriverLoad onmatch="include"/>
+    </RuleGroup>
+
+    <!-- ================================================================= -->
+    <!-- EVENT 7 – IMAGE LOAD (DLL) – Tier 2 suspicious loads              -->
+    <!-- ================================================================= -->
+    <RuleGroup groupRelation="or">
+      <ImageLoad onmatch="exclude">
+        <Rule groupRelation="or">
+          <Image condition="is">C:\Windows\System32\lsass.exe</Image>
+          <Image condition="is">C:\Windows\System32\svchost.exe</Image>
+          <Image condition="is">C:\Windows\System32\services.exe</Image>
+          <Image condition="is">C:\Windows\System32\winlogon.exe</Image>
+          <Image condition="is">C:\Windows\System32\spoolsv.exe</Image>
+          <Image condition="is">C:\Windows\System32\LogonUI.exe</Image>
+        </Rule>
+      </ImageLoad>
+    </RuleGroup>
+    <RuleGroup groupRelation="or">
+      <ImageLoad onmatch="include">
+        <Rule groupRelation="or">
+          <!-- Credential dumping DLLs from suspicious paths (Tier 1) -->
+          <Rule groupRelation="and">
+            <Rule groupRelation="or">
+              <ImageLoaded condition="end with">\samlib.dll</ImageLoaded>
+              <ImageLoaded condition="end with">\wdigest.dll</ImageLoaded>
+              <ImageLoaded condition="end with">\vaultcli.dll</ImageLoaded>
+              <ImageLoaded condition="end with">\credui.dll</ImageLoaded>
+              <ImageLoaded condition="end with">\dpapi.dll</ImageLoaded>
+            </Rule>
+            <Rule groupRelation="or">
+              <Image condition="begin with">C:\Windows\Temp\</Image>
+              <Image condition="begin with">C:\Temp\</Image>
+              <Image condition="begin with">C:\Users\Public\</Image>
+              <Image condition="contains">\AppData\Local\Temp\</Image>
+              <Image condition="contains">\Downloads\</Image>
+            </Rule>
+          </Rule>
+          <!-- Unsigned DLL loaded by a signed Microsoft binary (DLL side-loading) -->
+          <Rule groupRelation="and">
+            <SignatureStatus condition="is">Invalid</SignatureStatus>
+            <Rule groupRelation="or">
+              <Image condition="is">C:\Windows\System32\svchost.exe</Image>
+              <Image condition="is">C:\Windows\System32\rundll32.exe</Image>
+              <Image condition="is">C:\Windows\System32\regsvr32.exe</Image>
+              <Image condition="is">C:\Windows\System32\msiexec.exe</Image>
+              <Image condition="is">C:\Windows\System32\spoolsv.exe</Image>
+              <Image condition="is">C:\Windows\System32\services.exe</Image>
+              <Image condition="is">C:\Windows\System32\winlogon.exe</Image>
+              <Image condition="is">C:\Windows\System32\csrss.exe</Image>
+            </Rule>
+          </Rule>
+        </Rule>
+      </ImageLoad>
+    </RuleGroup>
+
+    <!-- ================================================================= -->
+    <!-- EVENT 8 – CREATEREMOTETHREAD (Tier 1 – Process injection)         -->
+    <!-- ================================================================= -->
+    <RuleGroup groupRelation="or">
+      <CreateRemoteThread onmatch="exclude">
+        <Rule groupRelation="or">
+          <SourceImage condition="is">C:\Windows\System32\svchost.exe</SourceImage>
+          <SourceImage condition="is">C:\Windows\System32\wininit.exe</SourceImage>
+          <SourceImage condition="is">C:\Windows\System32\csrss.exe</SourceImage>
+          <SourceImage condition="is">C:\Windows\System32\services.exe</SourceImage>
+          <SourceImage condition="is">C:\Windows\System32\audiodg.exe</SourceImage>
+          <SourceImage condition="is">C:\Windows\System32\wbem\WmiPrvSE.exe</SourceImage>
+          <TargetImage condition="end with">\chrome.exe</TargetImage>
+          <TargetImage condition="end with">\msedge.exe</TargetImage>
+          <TargetImage condition="end with">\firefox.exe</TargetImage>
+        </Rule>
+      </CreateRemoteThread>
+    </RuleGroup>
+    <RuleGroup groupRelation="or">
+      <CreateRemoteThread onmatch="include"/>
+    </RuleGroup>
+
+    <!-- ================================================================= -->
+    <!-- EVENT 10 – PROCESSACCESS (LSASS) – Tier 1 credential dumping       -->
+    <!-- ================================================================= -->
+    <RuleGroup groupRelation="or">
+      <ProcessAccess onmatch="exclude">
+        <Rule groupRelation="and">
+          <TargetImage condition="is">C:\Windows\system32\lsass.exe</TargetImage>
+          <Rule groupRelation="or">
+            <!-- Legitimate EDR / security tools -->
+            <SourceImage condition="end with">\MsMpEng.exe</SourceImage>
+            <SourceImage condition="end with">\MonitoringHost.exe</SourceImage>
+            <SourceImage condition="end with">\SentinelAgent.exe</SourceImage>
+            <SourceImage condition="end with">\SentinelHelperService.exe</SourceImage>
+            <SourceImage condition="end with">\CSFalconService.exe</SourceImage>
+            <SourceImage condition="end with">\MsSense.exe</SourceImage>
+            <SourceImage condition="end with">\RepMgr.exe</SourceImage>
+            <SourceImage condition="end with">\cb.exe</SourceImage>
+            <SourceImage condition="end with">\QualysAgent.exe</SourceImage>
+            <SourceImage condition="end with">\TaniumClient.exe</SourceImage>
+            <!-- Administrative tools (reduce false positives) -->
+            <SourceImage condition="contains">\Procmon.exe</SourceImage>
+            <SourceImage condition="contains">\ProcessHacker.exe</SourceImage>
+            <SourceImage condition="contains">\Taskmgr.exe</SourceImage>
+          </Rule>
+        </Rule>
+      </ProcessAccess>
+    </RuleGroup>
+
+    <RuleGroup groupRelation="or">
+      <ProcessAccess onmatch="include">
+        <Rule groupRelation="or">
+          <!-- Critical access masks (Tier 1) -->
+          <Rule groupRelation="and">
+            <TargetImage condition="is">C:\Windows\system32\lsass.exe</TargetImage>
+            <GrantedAccess condition="is">0x1FFFFF</GrantedAccess>
+          </Rule>
+          <Rule groupRelation="and">
+            <TargetImage condition="is">C:\Windows\system32\lsass.exe</TargetImage>
+            <GrantedAccess condition="is">0x1F1FFF</GrantedAccess>
+          </Rule>
+          <Rule groupRelation="and">
+            <TargetImage condition="is">C:\Windows\system32\lsass.exe</TargetImage>
+            <GrantedAccess condition="is">0x143A</GrantedAccess>
+          </Rule>
+          <Rule groupRelation="and">
+            <TargetImage condition="is">C:\Windows\system32\lsass.exe</TargetImage>
+            <GrantedAccess condition="is">0x1010</GrantedAccess>
+          </Rule>
+          <Rule groupRelation="and">
+            <TargetImage condition="is">C:\Windows\system32\lsass.exe</TargetImage>
+            <GrantedAccess condition="is">0x1410</GrantedAccess>
+          </Rule>
+
+          <!-- CallTrace with debug DLLs (minidump) -->
+          <Rule groupRelation="and">
+            <TargetImage condition="is">C:\Windows\system32\lsass.exe</TargetImage>
+            <Rule groupRelation="or">
+              <CallTrace condition="contains">dbghelp.dll</CallTrace>
+              <CallTrace condition="contains">dbgcore.dll</CallTrace>
+            </Rule>
+          </Rule>
+
+          <!-- Known credential dumping tools -->
+          <Rule groupRelation="and">
+            <SourceImage condition="end with">\procdump.exe</SourceImage>
+            <TargetImage condition="is">C:\Windows\system32\lsass.exe</TargetImage>
+          </Rule>
+          <Rule groupRelation="and">
+            <SourceImage condition="end with">\sqldumper.exe</SourceImage>
+            <TargetImage condition="is">C:\Windows\system32\lsass.exe</TargetImage>
+          </Rule>
+          <Rule groupRelation="and">
+            <SourceImage condition="end with">\rundll32.exe</SourceImage>
+            <TargetImage condition="is">C:\Windows\system32\lsass.exe</TargetImage>
+            <GrantedAccess condition="is">0x1FFFFF</GrantedAccess>
+          </Rule>
+          <Rule groupRelation="and">
+            <SourceImage condition="end with">\nanodump.exe</SourceImage>
+            <TargetImage condition="is">C:\Windows\system32\lsass.exe</TargetImage>
+          </Rule>
+          <Rule groupRelation="and">
+            <SourceImage condition="end with">\dumpert.exe</SourceImage>
+            <TargetImage condition="is">C:\Windows\system32\lsass.exe</TargetImage>
+          </Rule>
+
+          <!-- Suspicious source paths accessing LSASS (Tier 2) -->
+          <Rule groupRelation="and">
+            <SourceImage condition="begin with">C:\Windows\Temp\</SourceImage>
+            <TargetImage condition="is">C:\Windows\system32\lsass.exe</TargetImage>
+          </Rule>
+          <Rule groupRelation="and">
+            <SourceImage condition="contains">\AppData\Local\Temp\</SourceImage>
+            <TargetImage condition="is">C:\Windows\system32\lsass.exe</TargetImage>
+          </Rule>
+          <Rule groupRelation="and">
+            <SourceImage condition="contains">\Downloads\</SourceImage>
+            <TargetImage condition="is">C:\Windows\system32\lsass.exe</TargetImage>
+          </Rule>
+          <!-- LOLBins accessing LSASS (high suspicion) -->
+          <Rule groupRelation="and">
+            <SourceImage condition="end with">\powershell.exe</SourceImage>
+            <TargetImage condition="is">C:\Windows\system32\lsass.exe</TargetImage>
+          </Rule>
+        </Rule>
+      </ProcessAccess>
+    </RuleGroup>
+
+    <!-- ================================================================= -->
+    <!-- EVENT 11 – FILECREATE (Tier 2 – Persistence & staging)            -->
+    <!-- ================================================================= -->
+    <RuleGroup groupRelation="or">
+      <FileCreate onmatch="exclude">
+        <Rule groupRelation="or">
+          <TargetFilename condition="contains">\Prefetch\</TargetFilename>
+          <TargetFilename condition="begin with">C:\Windows\System32\DriverStore\Temp\</TargetFilename>
+          <TargetFilename condition="begin with">C:\Windows\winsxs\</TargetFilename>
+          <TargetFilename condition="end with">WRITABLE.TST</TargetFilename>
+          <TargetFilename condition="contains">\AppData\Local\Microsoft\Windows\INetCache\</TargetFilename>
+          <Image condition="is">C:\Windows\System32\svchost.exe</Image>
+          <Image condition="is">C:\Windows\System32\CompatTelRunner.exe</Image>
+          <Image condition="is">C:\Windows\System32\msiexec.exe</Image>
+          <Image condition="is">C:\Windows\servicing\TrustedInstaller.exe</Image>
+          <Image condition="is">C:\Windows\System32\wuauclt.exe</Image>
+        </Rule>
+      </FileCreate>
+    </RuleGroup>
+
+    <RuleGroup groupRelation="or">
+      <FileCreate onmatch="include">
+        <Rule groupRelation="or">
+          <!-- Persistence paths (Tier 1) -->
+          <TargetFilename condition="contains">\Start Menu\Programs\Startup\</TargetFilename>
+          <TargetFilename condition="contains">\Microsoft\Windows\Start Menu\Programs\Startup\</TargetFilename>
+          <TargetFilename condition="begin with">C:\Windows\System32\Tasks\</TargetFilename>
+          <TargetFilename condition="begin with">C:\Windows\Tasks\</TargetFilename>
+          <TargetFilename condition="begin with">C:\Windows\System32\GroupPolicy\</TargetFilename>
+
+          <!-- Executables/scripts in suspicious locations (Tier 2) -->
+          <Rule groupRelation="and">
+            <Rule groupRelation="or">
+              <TargetFilename condition="begin with">C:\Windows\Temp\</TargetFilename>
+              <TargetFilename condition="begin with">C:\Temp\</TargetFilename>
+              <TargetFilename condition="begin with">C:\Users\Public\</TargetFilename>
+              <TargetFilename condition="begin with">C:\PerfLogs\</TargetFilename>
+              <TargetFilename condition="contains">\AppData\Local\Temp\</TargetFilename>
+              <TargetFilename condition="contains">\AppData\Roaming\Microsoft\Windows\Start Menu\</TargetFilename>
+            </Rule>
+            <Rule groupRelation="or">
+              <TargetFilename condition="end with">.exe</TargetFilename>
+              <TargetFilename condition="end with">.dll</TargetFilename>
+              <TargetFilename condition="end with">.bat</TargetFilename>
+              <TargetFilename condition="end with">.cmd</TargetFilename>
+              <TargetFilename condition="end with">.ps1</TargetFilename>
+              <TargetFilename condition="end with">.vbs</TargetFilename>
+              <TargetFilename condition="end with">.js</TargetFilename>
+              <TargetFilename condition="end with">.hta</TargetFilename>
+              <TargetFilename condition="end with">.scr</TargetFilename>
+              <TargetFilename condition="end with">.lnk</TargetFilename>
+              <TargetFilename condition="end with">.jar</TargetFilename>
+            </Rule>
+          </Rule>
+
+          <!-- Desktop/Documents executable drops (phishing) -->
+          <Rule groupRelation="and">
+            <Rule groupRelation="or">
+              <TargetFilename condition="contains">\Desktop\</TargetFilename>
+              <TargetFilename condition="contains">\Documents\</TargetFilename>
+            </Rule>
+            <Rule groupRelation="or">
+              <TargetFilename condition="end with">.exe</TargetFilename>
+              <TargetFilename condition="end with">.ps1</TargetFilename>
+              <TargetFilename condition="end with">.vbs</TargetFilename>
+              <TargetFilename condition="end with">.js</TargetFilename>
+              <TargetFilename condition="end with">.hta</TargetFilename>
+              <TargetFilename condition="end with">.scr</TargetFilename>
+              <TargetFilename condition="end with">.lnk</TargetFilename>
+            </Rule>
+          </Rule>
+
+          <!-- Driver installation -->
+          <Rule groupRelation="and">
+            <TargetFilename condition="begin with">C:\Windows\System32\drivers\</TargetFilename>
+            <TargetFilename condition="end with">.sys</TargetFilename>
+          </Rule>
+
+          <!-- Outlook temporary files (malicious scripts) -->
+          <Rule groupRelation="and">
+            <TargetFilename condition="contains">\Content.Outlook\</TargetFilename>
+            <Rule groupRelation="or">
+              <TargetFilename condition="end with">.js</TargetFilename>
+              <TargetFilename condition="end with">.vbs</TargetFilename>
+              <TargetFilename condition="end with">.hta</TargetFilename>
+              <TargetFilename condition="end with">.ps1</TargetFilename>
+              <TargetFilename condition="end with">.wsf</TargetFilename>
+            </Rule>
+          </Rule>
+
+          <!-- Archive / disk image files (ransomware delivery) -->
+          <TargetFilename condition="end with">.iso</TargetFilename>
+          <TargetFilename condition="end with">.img</TargetFilename>
+          <TargetFilename condition="end with">.vhd</TargetFilename>
+          <TargetFilename condition="end with">.vhdx</TargetFilename>
+          <TargetFilename condition="end with">.7z</TargetFilename>
+          <TargetFilename condition="end with">.rar</TargetFilename>
+        </Rule>
+      </FileCreate>
+    </RuleGroup>
+
+    <!-- ================================================================= -->
+    <!-- EVENT 15 – FILECREATESTREAMHASH (ADS detection) – Tier 2          -->
+    <!-- ================================================================= -->
+    <RuleGroup groupRelation="or">
+      <FileCreateStreamHash onmatch="include"/>
+    </RuleGroup>
+
+    <!-- ================================================================= -->
+    <!-- EVENT 12,13,14 – REGISTRY (Tier 1 persistence & tampering)        -->
+    <!-- ================================================================= -->
+    <RuleGroup groupRelation="or">
+      <RegistryEvent onmatch="exclude">
+        <Rule groupRelation="or">
+          <TargetObject condition="contains">\OpenWithList</TargetObject>
+          <TargetObject condition="contains">\UserChoice</TargetObject>
+          <TargetObject condition="contains">\WINEVT\Publishers\</TargetObject>
+          <Image condition="is">C:\Windows\System32\svchost.exe</Image>
+          <Image condition="is">C:\Windows\System32\lsass.exe</Image>
+        </Rule>
+      </RegistryEvent>
+    </RuleGroup>
+
+    <RuleGroup groupRelation="or">
+      <RegistryEvent onmatch="include">
+        <Rule groupRelation="or">
+          <!-- Run keys (persistence) -->
+          <TargetObject condition="contains">\CurrentVersion\Run</TargetObject>
+          <TargetObject condition="contains">\CurrentVersion\RunOnce</TargetObject>
+          <TargetObject condition="contains">\CurrentVersion\Policies\Explorer\Run</TargetObject>
+          <!-- IFEO debugger (persistence / evasion) -->
+          <TargetObject condition="contains">\Image File Execution Options\</TargetObject>
+          <!-- Winlogon hijacking -->
+          <TargetObject condition="contains">\Winlogon\Shell</TargetObject>
+          <TargetObject condition="contains">\Winlogon\Userinit</TargetObject>
+          <TargetObject condition="contains">\Winlogon\Notify</TargetObject>
+          <TargetObject condition="contains">\Winlogon\AppSetup</TargetObject>
+          <!-- AppInit / AppCert DLLs (process injection) -->
+          <TargetObject condition="contains">\AppInit_DLLs</TargetObject>
+          <TargetObject condition="contains">\Control\Session Manager\AppCertDlls</TargetObject>
+          <TargetObject condition="contains">\Microsoft\Windows NT\CurrentVersion\Windows\Appinit_Dlls</TargetObject>
+          <!-- LSA / Security Support Provider (credential harvesting) -->
+          <TargetObject condition="contains">\Lsa\Security Packages</TargetObject>
+          <TargetObject condition="contains">\Lsa\Notification Packages</TargetObject>
+          <TargetObject condition="contains">\Lsa\Authentication Packages</TargetObject>
+          <TargetObject condition="contains">\Control\SecurityProviders\WDigest\UseLogonCredential</TargetObject>
+          <!-- Shell service object delay load -->
+          <TargetObject condition="contains">\Microsoft\Windows\CurrentVersion\ShellServiceObjectDelayLoad</TargetObject>
+          <!-- Scheduled tasks -->
+          <TargetObject condition="contains">\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\Tasks</TargetObject>
+          <!-- Sysmon tampering -->
+          <TargetObject condition="contains">\SYSTEM\CurrentControlSet\Services\Sysmon</TargetObject>
+          <TargetObject condition="contains">\SYSTEM\CurrentControlSet\Services\SysmonDrv</TargetObject>
+          <!-- Print monitors (persistence) -->
+          <TargetObject condition="contains">\Control\Print\Monitors\</TargetObject>
+          <!-- New service installation -->
+          <Rule groupRelation="and">
+            <EventType condition="is">CreateKey</EventType>
+            <TargetObject condition="contains">\CurrentControlSet\Services\</TargetObject>
+          </Rule>
+          <!-- Defender tampering -->
+          <TargetObject condition="contains">\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection</TargetObject>
+          <TargetObject condition="contains">\SOFTWARE\Policies\Microsoft\Windows Defender</TargetObject>
+          <TargetObject condition="contains">\SYSTEM\CurrentControlSet\Services\WinDefend</TargetObject>
+        </Rule>
+      </RegistryEvent>
+    </RuleGroup>
+
+    <!-- ================================================================= -->
+    <!-- EVENT 17,18 – NAMED PIPES (Tier 2 – Lateral movement)             -->
+    <!-- ================================================================= -->
+    <RuleGroup groupRelation="or">
+      <PipeEvent onmatch="exclude">
+        <Rule groupRelation="or">
+          <PipeName condition="begin with">\mojo.</PipeName>
+          <PipeName condition="begin with">\crashpad_</PipeName>
+          <PipeName condition="begin with">\SQLLocal\</PipeName>
+          <PipeName condition="is">\srvsvc</PipeName>
+          <PipeName condition="is">\wkssvc</PipeName>
+          <PipeName condition="is">\winreg</PipeName>
+        </Rule>
+      </PipeEvent>
+    </RuleGroup>
+
+    <RuleGroup groupRelation="or">
+      <PipeEvent onmatch="include">
+        <Rule groupRelation="and">
+          <EventType condition="is">CreatePipe</EventType>
+          <Rule groupRelation="or">
+            <PipeName condition="begin with">\atsvc</PipeName>
+            <PipeName condition="begin with">\svcctl</PipeName>
+            <PipeName condition="begin with">\PSEXESVC</PipeName>
+            <PipeName condition="begin with">\lsass</PipeName>
+            <PipeName condition="begin with">\msf-pipe</PipeName>
+            <PipeName condition="begin with">\postex_</PipeName>
+            <PipeName condition="begin with">\status_</PipeName>
+            <PipeName condition="begin with">\gruntsvc</PipeName>
+            <PipeName condition="begin with">\msagent_</PipeName>
+          </Rule>
+        </Rule>
+      </PipeEvent>
+    </RuleGroup>
+
+    <!-- ================================================================= -->
+    <!-- EVENT 19,20,21 – WMI EVENTS (Tier 1 persistence)                  -->
+    <!-- ================================================================= -->
+    <RuleGroup groupRelation="or">
+      <WmiEvent onmatch="exclude">
+        <Rule groupRelation="or">
+          <EventNamespace condition="begin with">ROOT\CCM</EventNamespace>
+          <EventNamespace condition="begin with">ROOT\Microsoft\Windows\DesiredStateConfiguration</EventNamespace>
+        </Rule>
+      </WmiEvent>
+    </RuleGroup>
+    <RuleGroup groupRelation="or">
+      <WmiEvent onmatch="include">
+        <Rule groupRelation="or">
+          <Operation condition="is">Created</Operation>
+          <Operation condition="is">Modified</Operation>
+          <Operation condition="is">Deleted</Operation>
+        </Rule>
+      </WmiEvent>
+    </RuleGroup>
+
+    <!-- ================================================================= -->
+    <!-- EVENT 22 – DNS QUERY (Tier 2 – Suspicious process only)           -->
+    <!-- ================================================================= -->
+    <RuleGroup groupRelation="or">
+      <DnsQuery onmatch="exclude">
+        <Rule groupRelation="or">
+          <Image condition="end with">\svchost.exe</Image>
+          <Image condition="end with">\chrome.exe</Image>
+          <Image condition="end with">\msedge.exe</Image>
+          <Image condition="end with">\firefox.exe</Image>
+          <Image condition="is">C:\Windows\System32\dns.exe</Image>
+          <QueryName condition="end with">.microsoft.com</QueryName>
+          <QueryName condition="end with">.windowsupdate.com</QueryName>
+          <QueryName condition="end with">.azure.com</QueryName>
+          <!-- Reduce ad/tracker noise (optional) -->
+          <QueryName condition="end with">.doubleclick.net</QueryName>
+          <QueryName condition="end with">.google-analytics.com</QueryName>
+        </Rule>
+      </DnsQuery>
+    </RuleGroup>
+
+    <RuleGroup groupRelation="or">
+      <DnsQuery onmatch="include">
+        <Rule groupRelation="or">
+          <Image condition="end with">\powershell.exe</Image>
+          <Image condition="end with">\pwsh.exe</Image>
+          <Image condition="end with">\mshta.exe</Image>
+          <Image condition="end with">\rundll32.exe</Image>
+          <Image condition="end with">\wscript.exe</Image>
+          <Image condition="end with">\cscript.exe</Image>
+          <Image condition="end with">\certutil.exe</Image>
+          <Image condition="end with">\bitsadmin.exe</Image>
+          <Image condition="end with">\curl.exe</Image>
+          <Image condition="end with">\wmic.exe</Image>
+          <Image condition="end with">\regsvr32.exe</Image>
+          <Image condition="end with">\msiexec.exe</Image>
+          <Image condition="contains">\Temp\</Image>
+          <Image condition="contains">\Downloads\</Image>
+        </Rule>
+      </DnsQuery>
+    </RuleGroup>
+
+    <!-- ================================================================= -->
+    <!-- EVENT 23 – FILEDELETE (Tier 2 – Ransomware / anti‑forensics)      -->
+    <!-- ================================================================= -->
+    <RuleGroup groupRelation="or">
+      <FileDelete onmatch="include">
+        <Rule groupRelation="or">
+          <TargetFilename condition="end with">.vhd</TargetFilename>
+          <TargetFilename condition="end with">.vhdx</TargetFilename>
+          <TargetFilename condition="end with">.bkf</TargetFilename>
+          <TargetFilename condition="end with">.bak</TargetFilename>
+          <TargetFilename condition="end with">.backup</TargetFilename>
+          <TargetFilename condition="contains">\System Volume Information\</TargetFilename>
+          <TargetFilename condition="begin with">C:\Windows\System32\config\</TargetFilename>
+          <TargetFilename condition="end with">.edb</TargetFilename>
+        </Rule>
+      </FileDelete>
+    </RuleGroup>
+
+    <!-- ================================================================= -->
+    <!-- EVENT 25 – PROCESS TAMPERING (Tier 1 – Process hollowing, etc.)    -->
+    <!-- ================================================================= -->
+    <RuleGroup groupRelation="or">
+      <ProcessTampering onmatch="include"/>
+    </RuleGroup>
+
+  </EventFiltering>
+</Sysmon>
