@@ -974,6 +974,141 @@
       </style>
     </head>
 
+    <!-- DAILY WAZUH OPERATIONS & SYSTEM HEALTH COMMANDS -->
+    <div class="section-headline headline-info">
+      <span class="material-icons">terminal</span>
+      Daily Wazuh Operations & System Health Commands
+    </div>
+
+    <div class="grid">
+
+      <!-- STORAGE & DISK ANALYSIS -->
+      <div class="card card-clean">
+        <div class="card-header">
+          <span class="material-icons">storage</span> Storage & Disk Usage Analysis
+        </div>
+
+        <div class="cmd" data-copy="du -h | grep -E '^[0-9.]+[G]'">
+          <div class="cmd-desc">Show directories using GB storage</div>
+          <code>du -h | grep -E '^[0-9.]+[G]'</code>
+        </div>
+
+        <div class="cmd" data-copy="du -h | grep -E '^[0-9.]+[MG]'">
+          <div class="cmd-desc">Show directories using MB/GB storage</div>
+          <code>du -h | grep -E '^[0-9.]+[MG]'</code>
+        </div>
+
+        <div class="cmd" data-copy="df -h">
+          <div class="cmd-desc">Disk usage summary (human readable)</div>
+          <code>df -h</code>
+        </div>
+
+        <div class="cmd" data-copy="df -h --total">
+          <div class="cmd-desc">Disk usage total overview</div>
+          <code>df -h --total</code>
+        </div>
+      </div>
+
+      <!-- WAZUH SERVICE STATUS -->
+      <div class="card card-clean">
+        <div class="card-header">
+          <span class="material-icons">health_and_safety</span> Wazuh Service Status Check
+        </div>
+
+        <div class="cmd" data-copy="sudo systemctl status wazuh-manager">
+          <div class="cmd-desc">Wazuh Manager status</div>
+          <code>sudo systemctl status wazuh-manager</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo systemctl status wazuh-indexer">
+          <div class="cmd-desc">Wazuh Indexer status</div>
+          <code>sudo systemctl status wazuh-indexer</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo systemctl status wazuh-dashboard">
+          <div class="cmd-desc">Wazuh Dashboard status</div>
+          <code>sudo systemctl status wazuh-dashboard</code>
+        </div>
+
+        <div class="cmd" data-copy="systemctl status wazuh-manager wazuh-indexer wazuh-dashboard">
+          <div class="cmd-desc">All Wazuh services together</div>
+          <code>systemctl status wazuh-manager wazuh-indexer wazuh-dashboard</code>
+        </div>
+      </div>
+
+      <!-- WAZUH RESTART OPERATIONS -->
+      <div class="card card-clean">
+        <div class="card-header">
+          <span class="material-icons">restart_alt</span> Wazuh Restart & Recovery Commands
+        </div>
+
+        <div class="cmd" data-copy="sudo systemctl restart wazuh-manager">
+          <div class="cmd-desc">Restart Wazuh Manager</div>
+          <code>sudo systemctl restart wazuh-manager</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo systemctl restart wazuh-indexer">
+          <div class="cmd-desc">Restart Wazuh Indexer</div>
+          <code>sudo systemctl restart wazuh-indexer</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo systemctl restart wazuh-dashboard">
+          <div class="cmd-desc">Restart Wazuh Dashboard</div>
+          <code>sudo systemctl restart wazuh-dashboard</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo systemctl restart wazuh-manager wazuh-indexer wazuh-dashboard">
+          <div class="cmd-desc">Restart full Wazuh stack</div>
+          <code>sudo systemctl restart wazuh-manager wazuh-indexer wazuh-dashboard</code>
+        </div>
+      </div>
+
+      <!-- SOC UTILITIES -->
+      <div class="card card-clean">
+        <div class="card-header">
+          <span class="material-icons">security</span> SOC Utility Commands (Quick Use)
+        </div>
+
+        <div class="cmd" data-copy="sudo tail -f /var/ossec/logs/ossec.log">
+          <div class="cmd-desc">Wazuh manager live logs</div>
+          <code>sudo tail -f /var/ossec/logs/ossec.log</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo tail -f /var/log/wazuh-indexer/wazuh-indexer.log">
+          <div class="cmd-desc">Indexer live logs</div>
+          <code>sudo tail -f /var/log/wazuh-indexer/wazuh-indexer.log</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo tail -f /var/log/wazuh-dashboard/wazuh-dashboard.log">
+          <div class="cmd-desc">Dashboard live logs</div>
+          <code>sudo tail -f /var/log/wazuh-dashboard/wazuh-dashboard.log</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo journalctl -u wazuh-manager -f">
+          <div class="cmd-desc">System logs (manager)</div>
+          <code>sudo journalctl -u wazuh-manager -f</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo journalctl -u wazuh-indexer -f">
+          <div class="cmd-desc">System logs (indexer)</div>
+          <code>sudo journalctl -u wazuh-indexer -f</code>
+        </div>
+
+        <!-- NEW PROCESS & PERFORMANCE MONITORING -->
+        <div class="cmd" data-copy="htop">
+          <div class="cmd-desc">Interactive process monitor (CPU, RAM, load)</div>
+          <code>htop</code>
+        </div>
+
+        <div class="cmd" data-copy="top">
+          <div class="cmd-desc">Basic Linux process + CPU usage view</div>
+          <code>top</code>
+        </div>
+
+      </div>
+
+    </div>
+
     <body>
       <div class="container">
         <!-- ========== NEW WA ZUH SHOWCASE ========== -->
@@ -1006,80 +1141,80 @@
     </body>
 
     </html>
-<div class="section-headline headline-server">
-  <span class="material-icons">dns</span> Wazuh Server (Ubuntu 22.04 LTS)
-</div>
 
-<div class="grid">
 
-  <!-- MERGED CARD -->
-  <div class="card card-server">
-    <div class="card-header">
-      <span class="material-icons">install_desktop</span>
-      <h3>Ubuntu ISO + All-in-One Install</h3>
+
+
+    <div class="section-headline headline-server">
+      <span class="material-icons">dns</span> Wazuh Server (Ubuntu 22.04 LTS)
     </div>
+    <div class="grid">
 
-    <a href="https://releases.ubuntu.com/22.04/ubuntu-22.04.5-desktop-amd64.iso"
-      class="btn-download" target="_blank">
-      <span class="material-icons">cloud_download</span>
-      Download Ubuntu 22.04.5
-    </a>
+      <!-- MERGED CARD -->
+      <div class="card card-server">
+        <div class="card-header">
+          <span class="material-icons">install_desktop</span>
+          <h3>Ubuntu ISO + All-in-One Install</h3>
+        </div>
 
-    <a href="https://documentation.wazuh.com/current/quickstart.html"
-      class="btn-download" target="_blank">
-      <span class="material-icons">web</span>
-      Latest Wazuh Installation Assistant
-    </a>
+        <a href="https://releases.ubuntu.com/22.04/ubuntu-22.04.5-desktop-amd64.iso" class="btn-download"
+          target="_blank">
+          <span class="material-icons">cloud_download</span>
+          Download Ubuntu 22.04.5
+        </a>
 
-    <div class="cmd" data-copy="sudo apt update && sudo apt upgrade -y">
-      <div class="cmd-desc">Update & Upgrade Ubuntu</div>
-      <code>sudo apt update && sudo apt upgrade -y</code>
-    </div>
+        <a href="https://documentation.wazuh.com/current/quickstart.html" class="btn-download" target="_blank">
+          <span class="material-icons">web</span>
+          Latest Wazuh Installation Assistant
+        </a>
 
-    <div class="cmd"
-      data-copy="curl -sO https://packages.wazuh.com/4.x/wazuh-install.sh && sudo bash ./wazuh-install.sh -a">
-      <div class="cmd-desc">Official Wazuh All-in-One Installer (Latest Stable 4.x)</div>
-      <code>curl -sO https://packages.wazuh.com/4.x/wazuh-install.sh &amp;&amp; sudo bash ./wazuh-install.sh -a</code>
-    </div>
+        <div class="cmd" data-copy="sudo apt update && sudo apt upgrade -y">
+          <div class="cmd-desc">Update & Upgrade Ubuntu</div>
+          <code>sudo apt update && sudo apt upgrade -y</code>
+        </div>
 
-    <div class="cmd"
-      data-copy="sudo systemctl daemon-reexec
+        <div class="cmd"
+          data-copy="curl -sO https://packages.wazuh.com/4.x/wazuh-install.sh && sudo bash ./wazuh-install.sh -a">
+          <div class="cmd-desc">Official Wazuh All-in-One Installer (Latest Stable 4.x)</div>
+          <code>curl -sO https://packages.wazuh.com/4.x/wazuh-install.sh &amp;&amp; sudo bash ./wazuh-install.sh -a</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo systemctl daemon-reexec
 sudo systemctl restart wazuh-indexer
 sudo systemctl restart wazuh-manager
 sudo systemctl restart wazuh-dashboard">
-      <div class="cmd-desc">Restart and Initialize Wazuh Services</div>
-      <code>sudo systemctl daemon-reexec<br>
+          <div class="cmd-desc">Restart and Initialize Wazuh Services</div>
+          <code>sudo systemctl daemon-reexec<br>
 sudo systemctl restart wazuh-indexer<br>
 sudo systemctl restart wazuh-manager<br>
 sudo systemctl restart wazuh-dashboard</code>
-    </div>
+        </div>
 
-    <div class="cmd"
-      data-copy="sudo systemctl status wazuh-indexer
+        <div class="cmd" data-copy="sudo systemctl status wazuh-indexer
 sudo systemctl status wazuh-dashboard
 sudo systemctl status wazuh-manager">
-      <div class="cmd-desc">Check Wazuh Service Status</div>
-      <code>sudo systemctl status wazuh-indexer<br>
+          <div class="cmd-desc">Check Wazuh Service Status</div>
+          <code>sudo systemctl status wazuh-indexer<br>
 sudo systemctl status wazuh-dashboard<br>
 sudo systemctl status wazuh-manager</code>
-    </div>
+        </div>
 
-  </div>
-<div class="card card-server">
+      </div>
+      <div class="card card-server">
 
-  <div class="card-header">
-    <span class="material-icons">security</span>
-    <h3>UFW Firewall Configuration One-Click Setup </h3>
-  </div>
- <!-- ONE CLICK SETUP -->
-  <div class="cmd"
-    data-copy="sudo ufw allow 22/tcp && sudo ufw allow OpenSSH && sudo ufw allow 1514/tcp && sudo ufw allow 1514/udp && sudo ufw allow 1515/tcp && sudo ufw allow 55000/tcp && sudo ufw allow 443/tcp && sudo ufw allow 80/tcp && sudo ufw allow 9200/tcp && sudo ufw allow 9300/tcp && sudo ufw allow 5044/tcp && sudo ufw reload && sudo ufw enable">
+        <div class="card-header">
+          <span class="material-icons">security</span>
+          <h3>UFW Firewall Configuration One-Click Setup </h3>
+        </div>
+        <!-- ONE CLICK SETUP -->
+        <div class="cmd"
+          data-copy="sudo ufw allow 22/tcp && sudo ufw allow OpenSSH && sudo ufw allow 1514/tcp && sudo ufw allow 1514/udp && sudo ufw allow 1515/tcp && sudo ufw allow 55000/tcp && sudo ufw allow 443/tcp && sudo ufw allow 80/tcp && sudo ufw allow 9200/tcp && sudo ufw allow 9300/tcp && sudo ufw allow 5044/tcp && sudo ufw reload && sudo ufw enable">
 
-    <div class="cmd-desc">
-      One-Click Complete Wazuh Firewall Setup (SSH Safe + Enable UFW at End)
-    </div>
+          <div class="cmd-desc">
+            One-Click Complete Wazuh Firewall Setup (SSH Safe + Enable UFW at End)
+          </div>
 
-    <code>
+          <code>
 sudo ufw allow 22/tcp &&<br>
 sudo ufw allow OpenSSH &&<br>
 sudo ufw allow 1514/tcp &&<br>
@@ -1095,223 +1230,203 @@ sudo ufw reload &&<br>
 sudo ufw enable
     </code>
 
-  </div>
-  </div>
-  <!-- FIREWALL CARD -->
-<div class="card card-server">
-
-  <div class="card-header">
-    <span class="material-icons">security</span>
-    <h3>UFW Firewall Configuration</h3>
-  </div>
-
- 
-
-  <div class="cmd"
-    data-copy="sudo ufw allow 22/tcp">
-    <div class="cmd-desc">
-      IMPORTANT: Allow SSH first before enabling UFW (Prevents EC2/VPS Lockout)
-    </div>
-    <code>sudo ufw allow 22/tcp</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo ufw allow OpenSSH">
-    <div class="cmd-desc">
-      Alternative SSH Rule Using OpenSSH Profile
-    </div>
-    <code>sudo ufw allow OpenSSH</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo ufw enable">
-    <div class="cmd-desc">
-      Enable UFW Firewall
-    </div>
-    <code>sudo ufw enable</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo ufw status numbered">
-    <div class="cmd-desc">
-      Verify Active Firewall Rules
-    </div>
-    <code>sudo ufw status numbered</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo ufw allow 1514/tcp">
-    <div class="cmd-desc">
-      Wazuh Agent Communication (TCP 1514)
-    </div>
-    <code>sudo ufw allow 1514/tcp</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo ufw allow 1514/udp">
-    <div class="cmd-desc">
-      Wazuh Agent Communication (UDP 1514)
-    </div>
-    <code>sudo ufw allow 1514/udp</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo ufw allow 1515/tcp">
-    <div class="cmd-desc">
-      Agent Enrollment Service (1515)
-    </div>
-    <code>sudo ufw allow 1515/tcp</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo ufw allow 55000/tcp">
-    <div class="cmd-desc">
-      Wazuh API Access (55000)
-    </div>
-    <code>sudo ufw allow 55000/tcp</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo ufw allow 443/tcp">
-    <div class="cmd-desc">
-      HTTPS Dashboard Access
-    </div>
-    <code>sudo ufw allow 443/tcp</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo ufw allow 80/tcp">
-    <div class="cmd-desc">
-      HTTP Redirect / Web Access
-    </div>
-    <code>sudo ufw allow 80/tcp</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo ufw allow 9200/tcp">
-    <div class="cmd-desc">
-      Wazuh Indexer HTTP API
-    </div>
-    <code>sudo ufw allow 9200/tcp</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo ufw allow 9300/tcp">
-    <div class="cmd-desc">
-      Wazuh Indexer Cluster Transport
-    </div>
-    <code>sudo ufw allow 9300/tcp</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo ufw allow 5044/tcp">
-    <div class="cmd-desc">
-      Filebeat Log Shipping
-    </div>
-    <code>sudo ufw allow 5044/tcp</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo ufw reload">
-    <div class="cmd-desc">
-      Reload Firewall Rules
-    </div>
-    <code>sudo ufw reload</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo ufw status verbose">
-    <div class="cmd-desc">
-      Check Final Firewall Status
-    </div>
-    <code>sudo ufw status verbose</code>
-  </div>
-
-</div>
-
-  <!-- PASSWORD RESET CARD -->
-  <div class="card card-server">
-
-    <div class="card-header">
-      <span class="material-icons">lock_reset</span>
-      <h3>Password Reset (Wazuh Dashboard)</h3>
-    </div>
-
-    <div class="cmd"
-      data-copy="sudo /usr/share/wazuh-indexer/plugins/opensearch-security/tools/wazuh-passwords-tool.sh">
-      <div class="cmd-desc">
-        Reset all Wazuh passwords (auto-generated for admin, kibanaserver, API users)
+        </div>
       </div>
-      <code>sudo /usr/share/wazuh-indexer/plugins/opensearch-security/tools/wazuh-passwords-tool.sh</code>
-    </div>
+      <!-- FIREWALL CARD -->
+      <div class="card card-server">
 
-    <div class="cmd"
-      data-copy="sudo /usr/share/wazuh-indexer/plugins/opensearch-security/tools/wazuh-passwords-tool.sh -u admin -p 'Admin@123#Secure'">
-      <div class="cmd-desc">
-        Set custom admin password
+        <div class="card-header">
+          <span class="material-icons">security</span>
+          <h3>UFW Firewall Configuration</h3>
+        </div>
+
+
+
+        <div class="cmd" data-copy="sudo ufw allow 22/tcp">
+          <div class="cmd-desc">
+            IMPORTANT: Allow SSH first before enabling UFW (Prevents EC2/VPS Lockout)
+          </div>
+          <code>sudo ufw allow 22/tcp</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo ufw allow OpenSSH">
+          <div class="cmd-desc">
+            Alternative SSH Rule Using OpenSSH Profile
+          </div>
+          <code>sudo ufw allow OpenSSH</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo ufw enable">
+          <div class="cmd-desc">
+            Enable UFW Firewall
+          </div>
+          <code>sudo ufw enable</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo ufw status numbered">
+          <div class="cmd-desc">
+            Verify Active Firewall Rules
+          </div>
+          <code>sudo ufw status numbered</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo ufw allow 1514/tcp">
+          <div class="cmd-desc">
+            Wazuh Agent Communication (TCP 1514)
+          </div>
+          <code>sudo ufw allow 1514/tcp</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo ufw allow 1514/udp">
+          <div class="cmd-desc">
+            Wazuh Agent Communication (UDP 1514)
+          </div>
+          <code>sudo ufw allow 1514/udp</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo ufw allow 1515/tcp">
+          <div class="cmd-desc">
+            Agent Enrollment Service (1515)
+          </div>
+          <code>sudo ufw allow 1515/tcp</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo ufw allow 55000/tcp">
+          <div class="cmd-desc">
+            Wazuh API Access (55000)
+          </div>
+          <code>sudo ufw allow 55000/tcp</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo ufw allow 443/tcp">
+          <div class="cmd-desc">
+            HTTPS Dashboard Access
+          </div>
+          <code>sudo ufw allow 443/tcp</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo ufw allow 80/tcp">
+          <div class="cmd-desc">
+            HTTP Redirect / Web Access
+          </div>
+          <code>sudo ufw allow 80/tcp</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo ufw allow 9200/tcp">
+          <div class="cmd-desc">
+            Wazuh Indexer HTTP API
+          </div>
+          <code>sudo ufw allow 9200/tcp</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo ufw allow 9300/tcp">
+          <div class="cmd-desc">
+            Wazuh Indexer Cluster Transport
+          </div>
+          <code>sudo ufw allow 9300/tcp</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo ufw allow 5044/tcp">
+          <div class="cmd-desc">
+            Filebeat Log Shipping
+          </div>
+          <code>sudo ufw allow 5044/tcp</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo ufw reload">
+          <div class="cmd-desc">
+            Reload Firewall Rules
+          </div>
+          <code>sudo ufw reload</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo ufw status verbose">
+          <div class="cmd-desc">
+            Check Final Firewall Status
+          </div>
+          <code>sudo ufw status verbose</code>
+        </div>
+
       </div>
-      <code>sudo /usr/share/wazuh-indexer/plugins/opensearch-security/tools/wazuh-passwords-tool.sh -u admin -p 'Admin@123#Secure'</code>
-    </div>
 
-    <div class="cmd"
-      data-copy="sudo /usr/share/wazuh-indexer/plugins/opensearch-security/tools/wazuh-passwords-tool.sh -u kibanaserver -p 'NewPassword@123'">
-      <div class="cmd-desc">
-        Change kibanaserver password used by Wazuh Dashboard
-      </div>
-      <code>sudo /usr/share/wazuh-indexer/plugins/opensearch-security/tools/wazuh-passwords-tool.sh -u kibanaserver -p 'NewPassword@123'</code>
-    </div>
+      <!-- PASSWORD RESET CARD -->
+      <div class="card card-server">
 
-    <div class="cmd"
-      data-copy="sudo nano /etc/wazuh-dashboard/opensearch_dashboards.yml">
-      <div class="cmd-desc">
-        Open Wazuh Dashboard configuration file
-      </div>
-      <code>sudo nano /etc/wazuh-dashboard/opensearch_dashboards.yml</code>
-    </div>
+        <div class="card-header">
+          <span class="material-icons">lock_reset</span>
+          <h3>Password Reset (Wazuh Dashboard)</h3>
+        </div>
 
-    <div class="cmd"
-      data-copy='opensearch.password: "oldpassword"'>
-      <div class="cmd-desc">
-        Find Existing Password Entry
-      </div>
-      <code>opensearch.password: "oldpassword"</code>
-    </div>
+        <div class="cmd"
+          data-copy="sudo /usr/share/wazuh-indexer/plugins/opensearch-security/tools/wazuh-passwords-tool.sh">
+          <div class="cmd-desc">
+            Reset all Wazuh passwords (auto-generated for admin, kibanaserver, API users)
+          </div>
+          <code>sudo /usr/share/wazuh-indexer/plugins/opensearch-security/tools/wazuh-passwords-tool.sh</code>
+        </div>
 
-    <div class="cmd"
-      data-copy='opensearch.password: "NewPassword@123"'>
-      <div class="cmd-desc">
-        Replace With Updated Password
-      </div>
-      <code>opensearch.password: "NewPassword@123"</code>
-    </div>
+        <div class="cmd"
+          data-copy="sudo /usr/share/wazuh-indexer/plugins/opensearch-security/tools/wazuh-passwords-tool.sh -u admin -p 'Admin@123#Secure'">
+          <div class="cmd-desc">
+            Set custom admin password
+          </div>
+          <code>sudo /usr/share/wazuh-indexer/plugins/opensearch-security/tools/wazuh-passwords-tool.sh -u admin -p 'Admin@123#Secure'</code>
+        </div>
 
-    <div class="cmd"
-      data-copy="sudo systemctl restart wazuh-indexer
+        <div class="cmd"
+          data-copy="sudo /usr/share/wazuh-indexer/plugins/opensearch-security/tools/wazuh-passwords-tool.sh -u kibanaserver -p 'NewPassword@123'">
+          <div class="cmd-desc">
+            Change kibanaserver password used by Wazuh Dashboard
+          </div>
+          <code>sudo /usr/share/wazuh-indexer/plugins/opensearch-security/tools/wazuh-passwords-tool.sh -u kibanaserver -p 'NewPassword@123'</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo nano /etc/wazuh-dashboard/opensearch_dashboards.yml">
+          <div class="cmd-desc">
+            Open Wazuh Dashboard configuration file
+          </div>
+          <code>sudo nano /etc/wazuh-dashboard/opensearch_dashboards.yml</code>
+        </div>
+
+        <div class="cmd" data-copy='opensearch.password: "oldpassword"'>
+          <div class="cmd-desc">
+            Find Existing Password Entry
+          </div>
+          <code>opensearch.password: "oldpassword"</code>
+        </div>
+
+        <div class="cmd" data-copy='opensearch.password: "NewPassword@123"'>
+          <div class="cmd-desc">
+            Replace With Updated Password
+          </div>
+          <code>opensearch.password: "NewPassword@123"</code>
+        </div>
+
+        <div class="cmd" data-copy="sudo systemctl restart wazuh-indexer
 sudo systemctl restart wazuh-dashboard
 sudo systemctl restart wazuh-manager">
-      <div class="cmd-desc">
-        Restart Wazuh Services After Password Changes
-      </div>
-      <code>sudo systemctl restart wazuh-indexer<br>
+          <div class="cmd-desc">
+            Restart Wazuh Services After Password Changes
+          </div>
+          <code>sudo systemctl restart wazuh-indexer<br>
 sudo systemctl restart wazuh-dashboard<br>
 sudo systemctl restart wazuh-manager</code>
-    </div>
+        </div>
 
-    <div class="cmd"
-      data-copy="sudo systemctl status wazuh-indexer
+        <div class="cmd" data-copy="sudo systemctl status wazuh-indexer
 sudo systemctl status wazuh-dashboard
 sudo systemctl status wazuh-manager">
-      <div class="cmd-desc">
-        Verify Wazuh Services Status
-      </div>
-      <code>sudo systemctl status wazuh-indexer<br>
+          <div class="cmd-desc">
+            Verify Wazuh Services Status
+          </div>
+          <code>sudo systemctl status wazuh-indexer<br>
 sudo systemctl status wazuh-dashboard<br>
 sudo systemctl status wazuh-manager</code>
-    </div>
+        </div>
 
-  
 
-      
+
+
 
 
 
@@ -1834,7 +1949,7 @@ Use only for testing.
   <!-- ========== SYSCOLLECTOR ISSUE FIX (NOT ENOUGH HARDWARE INFO) ========== -->
   <div class="section-headline headline-server">
     <span class="material-icons">security</span>
-     Fix Filebeat : Scenario Fix: “Not enough hardware or OS information” At agent Dashboard (After Password Change)
+    Fix Filebeat : Scenario Fix: “Not enough hardware or OS information” At agent Dashboard (After Password Change)
   </div>
 
   <div class="grid">
@@ -2378,389 +2493,361 @@ Quick Debug Indicators:
   </body>
 
   </html>
-<!-- ========== DIAGNOSTICS & AGENT REMOVAL ========== -->
-<div class="section-headline headline-server">
-  <span class="material-icons">build</span>
-  Diagnostics & Agent Removal By Terminal
-</div>
 
-<div class="grid">
+  <!-- ========== DIAGNOSTICS & AGENT REMOVAL ========== -->
+  <div class="section-headline headline-server">
+    <span class="material-icons">build</span>
+    Diagnostics & Agent Removal By Terminal
+  </div>
 
-  <!-- ================= SERVER DIAGNOSTICS ================= -->
-  <div class="card card-server">
+  <div class="grid">
 
-    <div class="card-header">
-      <span class="material-icons">healing</span>
-      <h3>Diagnose Server</h3>
+    <!-- ================= SERVER DIAGNOSTICS ================= -->
+    <div class="card card-server">
+
+      <div class="card-header">
+        <span class="material-icons">healing</span>
+        <h3>Diagnose Server</h3>
+      </div>
+
+      <div class="cmd" data-copy="sudo /var/ossec/bin/agent_control -l">
+        <div class="cmd-desc">List All Connected Agents</div>
+        <code>sudo /var/ossec/bin/agent_control -l</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo /var/ossec/bin/agent_control -lc">
+        <div class="cmd-desc">List Only Active Agents</div>
+        <code>sudo /var/ossec/bin/agent_control -lc</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo journalctl -u wazuh-manager -f">
+        <div class="cmd-desc">View Live Wazuh Manager Logs</div>
+        <code>sudo journalctl -u wazuh-manager -f</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo journalctl -u wazuh-indexer -f">
+        <div class="cmd-desc">View Live Wazuh Indexer Logs</div>
+        <code>sudo journalctl -u wazuh-indexer -f</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo journalctl -u wazuh-dashboard -f">
+        <div class="cmd-desc">View Live Wazuh Dashboard Logs</div>
+        <code>sudo journalctl -u wazuh-dashboard -f</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo systemctl restart wazuh-manager wazuh-indexer wazuh-dashboard">
+        <div class="cmd-desc">Restart All Wazuh Services</div>
+        <code>sudo systemctl restart wazuh-manager wazuh-indexer wazuh-dashboard</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo systemctl status wazuh-manager wazuh-indexer wazuh-dashboard">
+        <div class="cmd-desc">Verify Wazuh Service Status</div>
+        <code>sudo systemctl status wazuh-manager wazuh-indexer wazuh-dashboard</code>
+      </div>
+
+      <div class="cmd" data-copy="ss -tulnp | grep -E '1514|1515|55000|9200|9300|443'">
+        <div class="cmd-desc">Verify Required Listening Ports</div>
+        <code>ss -tulnp | grep -E '1514|1515|55000|9200|9300|443'</code>
+      </div>
+
+      <div class="cmd" data-copy="curl -k -u admin:password https://localhost:9200">
+        <div class="cmd-desc">Verify Wazuh Indexer API Response</div>
+        <code>curl -k -u admin:password https://localhost:9200</code>
+      </div>
+
     </div>
 
-    <div class="cmd" data-copy="sudo /var/ossec/bin/agent_control -l">
-      <div class="cmd-desc">List All Connected Agents</div>
-      <code>sudo /var/ossec/bin/agent_control -l</code>
+    <!-- ================= LINUX AGENT DIAGNOSTICS ================= -->
+    <div class="card card-agent">
+
+      <div class="card-header">
+        <span class="material-icons">terminal</span>
+        <h3>Diagnose Agent Linux</h3>
+      </div>
+
+      <div class="cmd" data-copy="hostname -I">
+        <div class="cmd-desc">Check Linux Agent IP Address</div>
+        <code>hostname -I</code>
+      </div>
+
+      <div class="cmd" data-copy="ip a">
+        <div class="cmd-desc">Detailed Network Interfaces</div>
+        <code>ip a</code>
+      </div>
+
+      <div class="cmd" data-copy="ping <MANAGER_IP>">
+        <div class="cmd-desc">Verify Connectivity With Manager</div>
+        <code>ping &lt;MANAGER_IP&gt;</code>
+      </div>
+
+      <div class="cmd" data-copy="telnet <MANAGER_IP> 1514">
+        <div class="cmd-desc">Verify Communication Port 1514</div>
+        <code>telnet &lt;MANAGER_IP&gt; 1514</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo systemctl status wazuh-agent">
+        <div class="cmd-desc">Check Linux Agent Status</div>
+        <code>sudo systemctl status wazuh-agent</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo systemctl restart wazuh-agent">
+        <div class="cmd-desc">Restart Linux Agent Service</div>
+        <code>sudo systemctl restart wazuh-agent</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo tail -f /var/ossec/logs/ossec.log">
+        <div class="cmd-desc">View Linux Agent Logs</div>
+        <code>sudo tail -f /var/ossec/logs/ossec.log</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo nano /var/ossec/etc/ossec.conf">
+        <div class="cmd-desc">Edit Agent Configuration</div>
+        <code>sudo nano /var/ossec/etc/ossec.conf</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo /var/ossec/bin/agent-auth -m <MANAGER_IP>">
+        <div class="cmd-desc">Re-Register Linux Agent</div>
+        <code>sudo /var/ossec/bin/agent-auth -m &lt;MANAGER_IP&gt;</code>
+      </div>
+
     </div>
 
-    <div class="cmd" data-copy="sudo /var/ossec/bin/agent_control -lc">
-      <div class="cmd-desc">List Only Active Agents</div>
-      <code>sudo /var/ossec/bin/agent_control -lc</code>
+    <!-- ================= WINDOWS AGENT DIAGNOSTICS ================= -->
+    <div class="card card-agent">
+
+      <div class="card-header">
+        <span class="material-icons">desktop_windows</span>
+        <h3>Diagnose Agent Windows</h3>
+      </div>
+
+      <div class="cmd" data-copy="ipconfig">
+        <div class="cmd-desc">Check Windows Network Configuration</div>
+        <code>ipconfig</code>
+      </div>
+
+      <div class="cmd" data-copy="ping <MANAGER_IP>">
+        <div class="cmd-desc">Verify Connectivity With Manager</div>
+        <code>ping &lt;MANAGER_IP&gt;</code>
+      </div>
+
+      <div class="cmd" data-copy="Get-Service -Name wazuh">
+        <div class="cmd-desc">Check Windows Agent Service</div>
+        <code>Get-Service -Name wazuh</code>
+      </div>
+
+      <div class="cmd" data-copy="Restart-Service -Name wazuh">
+        <div class="cmd-desc">Restart Windows Agent Service</div>
+        <code>Restart-Service -Name wazuh</code>
+      </div>
+
+      <div class="cmd" data-copy="Get-Content 'C:\Program Files (x86)\ossec-agent\ossec.log' -Wait">
+        <div class="cmd-desc">View Windows Agent Logs</div>
+        <code>Get-Content 'C:\Program Files (x86)\ossec-agent\ossec.log' -Wait</code>
+      </div>
+
+      <div class="cmd" data-copy="notepad 'C:\Program Files (x86)\ossec-agent\ossec.conf'">
+        <div class="cmd-desc">Edit Windows Agent Configuration</div>
+        <code>notepad 'C:\Program Files (x86)\ossec-agent\ossec.conf'</code>
+      </div>
+
+    </div>
+    <!-- ================= MAC AGENT DIAGNOSTICS ================= -->
+    <div class="card card-agent">
+
+      <div class="card-header">
+        <span class="material-icons">laptop_mac</span>
+        <h3>Diagnose Agent macOS</h3>
+      </div>
+
+      <div class="cmd" data-copy="ifconfig">
+        <div class="cmd-desc">Check macOS Network Interfaces</div>
+        <code>ifconfig</code>
+      </div>
+
+      <div class="cmd" data-copy="ping <MANAGER_IP>">
+        <div class="cmd-desc">Verify Connectivity With Wazuh Manager</div>
+        <code>ping &lt;MANAGER_IP&gt;</code>
+      </div>
+
+      <div class="cmd" data-copy="nc -zv <MANAGER_IP> 1514">
+        <div class="cmd-desc">Verify Wazuh Communication Port 1514</div>
+        <code>nc -zv &lt;MANAGER_IP&gt; 1514</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo launchctl list | grep wazuh">
+        <div class="cmd-desc">Check Wazuh Agent Service Status</div>
+        <code>sudo launchctl list | grep wazuh</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo /Library/Ossec/bin/wazuh-control status">
+        <div class="cmd-desc">Check Wazuh Agent Status</div>
+        <code>sudo /Library/Ossec/bin/wazuh-control status</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo /Library/Ossec/bin/wazuh-control restart">
+        <div class="cmd-desc">Restart Wazuh Agent Service</div>
+        <code>sudo /Library/Ossec/bin/wazuh-control restart</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo tail -f /Library/Ossec/logs/ossec.log">
+        <div class="cmd-desc">View Real-Time Wazuh Agent Logs</div>
+        <code>sudo tail -f /Library/Ossec/logs/ossec.log</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo nano /Library/Ossec/etc/ossec.conf">
+        <div class="cmd-desc">Edit Wazuh Agent Configuration</div>
+        <code>sudo nano /Library/Ossec/etc/ossec.conf</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo grep -i error /Library/Ossec/logs/ossec.log">
+        <div class="cmd-desc">Check Agent Logs For Errors</div>
+        <code>sudo grep -i error /Library/Ossec/logs/ossec.log</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo /Library/Ossec/bin/agent-auth -m <MANAGER_IP>">
+        <div class="cmd-desc">Re-Register macOS Agent</div>
+        <code>sudo /Library/Ossec/bin/agent-auth -m &lt;MANAGER_IP&gt;</code>
+      </div>
+
+    </div>
+    <!-- ================= LINUX AGENT REMOVAL ================= -->
+    <div class="card card-agent">
+
+      <div class="card-header">
+        <span class="material-icons">person_remove</span>
+        <h3>Linux Agent Removal</h3>
+      </div>
+
+      <div class="cmd" data-copy="sudo systemctl stop wazuh-agent">
+        <div class="cmd-desc">Stop Linux Agent Service</div>
+        <code>sudo systemctl stop wazuh-agent</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo systemctl disable wazuh-agent">
+        <div class="cmd-desc">Disable Linux Agent Service</div>
+        <code>sudo systemctl disable wazuh-agent</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo apt purge wazuh-agent -y">
+        <div class="cmd-desc">Remove Linux Agent Completely</div>
+        <code>sudo apt purge wazuh-agent -y</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo rm -rf /var/ossec">
+        <div class="cmd-desc">Delete Residual Linux Agent Files</div>
+        <code>sudo rm -rf /var/ossec</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo /var/ossec/bin/manage_agents">
+        <div class="cmd-desc">Remove Linux Agent From Server</div>
+        <code>sudo /var/ossec/bin/manage_agents</code>
+      </div>
+
     </div>
 
-    <div class="cmd" data-copy="sudo journalctl -u wazuh-manager -f">
-      <div class="cmd-desc">View Live Wazuh Manager Logs</div>
-      <code>sudo journalctl -u wazuh-manager -f</code>
-    </div>
+    <!-- ================= WINDOWS AGENT REMOVAL ================= -->
+    <div class="card card-server">
 
-    <div class="cmd" data-copy="sudo journalctl -u wazuh-indexer -f">
-      <div class="cmd-desc">View Live Wazuh Indexer Logs</div>
-      <code>sudo journalctl -u wazuh-indexer -f</code>
-    </div>
+      <div class="card-header">
+        <span class="material-icons">desktop_windows</span>
+        <h3>Windows Agent Removal</h3>
+      </div>
 
-    <div class="cmd" data-copy="sudo journalctl -u wazuh-dashboard -f">
-      <div class="cmd-desc">View Live Wazuh Dashboard Logs</div>
-      <code>sudo journalctl -u wazuh-dashboard -f</code>
-    </div>
+      <div class="cmd" data-copy="Stop-Service -Name wazuh">
+        <div class="cmd-desc">Stop Windows Agent Service</div>
+        <code>Stop-Service -Name wazuh</code>
+      </div>
 
-    <div class="cmd"
-      data-copy="sudo systemctl restart wazuh-manager wazuh-indexer wazuh-dashboard">
-      <div class="cmd-desc">Restart All Wazuh Services</div>
-      <code>sudo systemctl restart wazuh-manager wazuh-indexer wazuh-dashboard</code>
-    </div>
+      <div class="cmd" data-copy="Set-Service -Name wazuh -StartupType Disabled">
+        <div class="cmd-desc">Disable Windows Agent Service</div>
+        <code>Set-Service -Name wazuh -StartupType Disabled</code>
+      </div>
 
-    <div class="cmd"
-      data-copy="sudo systemctl status wazuh-manager wazuh-indexer wazuh-dashboard">
-      <div class="cmd-desc">Verify Wazuh Service Status</div>
-      <code>sudo systemctl status wazuh-manager wazuh-indexer wazuh-dashboard</code>
-    </div>
+      <div class="cmd" data-copy='& "C:\Program Files (x86)\ossec-agent\uninstall.exe"'>
+        <div class="cmd-desc">Uninstall Windows Wazuh Agent</div>
+        <code>&amp; "C:\Program Files (x86)\ossec-agent\uninstall.exe"</code>
+      </div>
 
-    <div class="cmd"
-      data-copy="ss -tulnp | grep -E '1514|1515|55000|9200|9300|443'">
-      <div class="cmd-desc">Verify Required Listening Ports</div>
-      <code>ss -tulnp | grep -E '1514|1515|55000|9200|9300|443'</code>
-    </div>
+      <div class="cmd" data-copy='Remove-Item -Path "C:\Program Files (x86)\ossec-agent" -Recurse -Force'>
+        <div class="cmd-desc">Delete Residual Windows Agent Files</div>
+        <code>Remove-Item -Path "C:\Program Files (x86)\ossec-agent" -Recurse -Force</code>
+      </div>
 
-    <div class="cmd"
-      data-copy="curl -k -u admin:password https://localhost:9200">
-      <div class="cmd-desc">Verify Wazuh Indexer API Response</div>
-      <code>curl -k -u admin:password https://localhost:9200</code>
+      <div class="cmd" data-copy="sc.exe delete wazuh">
+        <div class="cmd-desc">Remove Wazuh Service Entry</div>
+        <code>sc.exe delete wazuh</code>
+      </div>
+
+      <div class="cmd" data-copy="Get-Service -Name wazuh">
+        <div class="cmd-desc">Verify Wazuh Service Removal</div>
+        <code>Get-Service -Name wazuh</code>
+      </div>
+
+      <div class="cmd" data-copy='Test-Path "C:\Program Files (x86)\ossec-agent"'>
+        <div class="cmd-desc">Verify Agent Files Removal</div>
+        <code>Test-Path "C:\Program Files (x86)\ossec-agent"</code>
+      </div>
+
+      <div class="cmd" data-copy="Restart-Computer">
+        <div class="cmd-desc">Recommended Windows Reboot</div>
+        <code>Restart-Computer</code>
+      </div>
+
     </div>
+    <!-- ================= MAC AGENT REMOVAL ================= -->
+    <div class="card card-agent">
+
+      <div class="card-header">
+        <span class="material-icons">laptop_mac</span>
+        <h3>macOS Agent Removal</h3>
+      </div>
+
+      <div class="cmd" data-copy="sudo launchctl unload /Library/LaunchDaemons/com.wazuh.agent.plist">
+        <div class="cmd-desc">Stop macOS Wazuh Agent Service</div>
+        <code>sudo launchctl unload /Library/LaunchDaemons/com.wazuh.agent.plist</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo rm -f /Library/LaunchDaemons/com.wazuh.agent.plist">
+        <div class="cmd-desc">Remove Wazuh LaunchDaemon Service</div>
+        <code>sudo rm -f /Library/LaunchDaemons/com.wazuh.agent.plist</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo /Library/Ossec/uninstall.sh">
+        <div class="cmd-desc">Run Official Wazuh Agent Uninstaller</div>
+        <code>sudo /Library/Ossec/uninstall.sh</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo rm -rf /Library/Ossec">
+        <div class="cmd-desc">Delete Residual Wazuh Agent Files</div>
+        <code>sudo rm -rf /Library/Ossec</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo pkgutil --forget com.wazuh.agent">
+        <div class="cmd-desc">Remove Wazuh Package Receipt</div>
+        <code>sudo pkgutil --forget com.wazuh.agent</code>
+      </div>
+
+      <div class="cmd" data-copy="launchctl list | grep wazuh">
+        <div class="cmd-desc">Verify Wazuh Service Removal</div>
+        <code>launchctl list | grep wazuh</code>
+      </div>
+
+      <div class="cmd" data-copy="test -d /Library/Ossec && echo 'Exists' || echo 'Removed'">
+        <div class="cmd-desc">Verify Agent Files Removal</div>
+        <code>test -d /Library/Ossec &amp;&amp; echo 'Exists' || echo 'Removed'</code>
+      </div>
+
+      <div class="cmd" data-copy="sudo reboot">
+        <div class="cmd-desc">Recommended macOS Reboot</div>
+        <code>sudo reboot</code>
+      </div>
+
+    </div>
+  </div>
 
   </div>
 
-  <!-- ================= LINUX AGENT DIAGNOSTICS ================= -->
-  <div class="card card-agent">
 
-    <div class="card-header">
-      <span class="material-icons">terminal</span>
-      <h3>Diagnose Agent Linux</h3>
-    </div>
-
-    <div class="cmd" data-copy="hostname -I">
-      <div class="cmd-desc">Check Linux Agent IP Address</div>
-      <code>hostname -I</code>
-    </div>
-
-    <div class="cmd" data-copy="ip a">
-      <div class="cmd-desc">Detailed Network Interfaces</div>
-      <code>ip a</code>
-    </div>
-
-    <div class="cmd" data-copy="ping <MANAGER_IP>">
-      <div class="cmd-desc">Verify Connectivity With Manager</div>
-      <code>ping &lt;MANAGER_IP&gt;</code>
-    </div>
-
-    <div class="cmd" data-copy="telnet <MANAGER_IP> 1514">
-      <div class="cmd-desc">Verify Communication Port 1514</div>
-      <code>telnet &lt;MANAGER_IP&gt; 1514</code>
-    </div>
-
-    <div class="cmd" data-copy="sudo systemctl status wazuh-agent">
-      <div class="cmd-desc">Check Linux Agent Status</div>
-      <code>sudo systemctl status wazuh-agent</code>
-    </div>
-
-    <div class="cmd" data-copy="sudo systemctl restart wazuh-agent">
-      <div class="cmd-desc">Restart Linux Agent Service</div>
-      <code>sudo systemctl restart wazuh-agent</code>
-    </div>
-
-    <div class="cmd" data-copy="sudo tail -f /var/ossec/logs/ossec.log">
-      <div class="cmd-desc">View Linux Agent Logs</div>
-      <code>sudo tail -f /var/ossec/logs/ossec.log</code>
-    </div>
-
-    <div class="cmd" data-copy="sudo nano /var/ossec/etc/ossec.conf">
-      <div class="cmd-desc">Edit Agent Configuration</div>
-      <code>sudo nano /var/ossec/etc/ossec.conf</code>
-    </div>
-
-    <div class="cmd" data-copy="sudo /var/ossec/bin/agent-auth -m <MANAGER_IP>">
-      <div class="cmd-desc">Re-Register Linux Agent</div>
-      <code>sudo /var/ossec/bin/agent-auth -m &lt;MANAGER_IP&gt;</code>
-    </div>
-
-  </div>
-
-  <!-- ================= WINDOWS AGENT DIAGNOSTICS ================= -->
-  <div class="card card-agent">
-
-    <div class="card-header">
-      <span class="material-icons">desktop_windows</span>
-      <h3>Diagnose Agent Windows</h3>
-    </div>
-
-    <div class="cmd" data-copy="ipconfig">
-      <div class="cmd-desc">Check Windows Network Configuration</div>
-      <code>ipconfig</code>
-    </div>
-
-    <div class="cmd" data-copy="ping <MANAGER_IP>">
-      <div class="cmd-desc">Verify Connectivity With Manager</div>
-      <code>ping &lt;MANAGER_IP&gt;</code>
-    </div>
-
-    <div class="cmd" data-copy="Get-Service -Name wazuh">
-      <div class="cmd-desc">Check Windows Agent Service</div>
-      <code>Get-Service -Name wazuh</code>
-    </div>
-
-    <div class="cmd" data-copy="Restart-Service -Name wazuh">
-      <div class="cmd-desc">Restart Windows Agent Service</div>
-      <code>Restart-Service -Name wazuh</code>
-    </div>
-
-    <div class="cmd"
-      data-copy="Get-Content 'C:\Program Files (x86)\ossec-agent\ossec.log' -Wait">
-      <div class="cmd-desc">View Windows Agent Logs</div>
-      <code>Get-Content 'C:\Program Files (x86)\ossec-agent\ossec.log' -Wait</code>
-    </div>
-
-    <div class="cmd"
-      data-copy="notepad 'C:\Program Files (x86)\ossec-agent\ossec.conf'">
-      <div class="cmd-desc">Edit Windows Agent Configuration</div>
-      <code>notepad 'C:\Program Files (x86)\ossec-agent\ossec.conf'</code>
-    </div>
-
-  </div>
-<!-- ================= MAC AGENT DIAGNOSTICS ================= -->
-<div class="card card-agent">
-
-  <div class="card-header">
-    <span class="material-icons">laptop_mac</span>
-    <h3>Diagnose Agent macOS</h3>
-  </div>
-
-  <div class="cmd"
-    data-copy="ifconfig">
-    <div class="cmd-desc">Check macOS Network Interfaces</div>
-    <code>ifconfig</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="ping <MANAGER_IP>">
-    <div class="cmd-desc">Verify Connectivity With Wazuh Manager</div>
-    <code>ping &lt;MANAGER_IP&gt;</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="nc -zv <MANAGER_IP> 1514">
-    <div class="cmd-desc">Verify Wazuh Communication Port 1514</div>
-    <code>nc -zv &lt;MANAGER_IP&gt; 1514</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo launchctl list | grep wazuh">
-    <div class="cmd-desc">Check Wazuh Agent Service Status</div>
-    <code>sudo launchctl list | grep wazuh</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo /Library/Ossec/bin/wazuh-control status">
-    <div class="cmd-desc">Check Wazuh Agent Status</div>
-    <code>sudo /Library/Ossec/bin/wazuh-control status</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo /Library/Ossec/bin/wazuh-control restart">
-    <div class="cmd-desc">Restart Wazuh Agent Service</div>
-    <code>sudo /Library/Ossec/bin/wazuh-control restart</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo tail -f /Library/Ossec/logs/ossec.log">
-    <div class="cmd-desc">View Real-Time Wazuh Agent Logs</div>
-    <code>sudo tail -f /Library/Ossec/logs/ossec.log</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo nano /Library/Ossec/etc/ossec.conf">
-    <div class="cmd-desc">Edit Wazuh Agent Configuration</div>
-    <code>sudo nano /Library/Ossec/etc/ossec.conf</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo grep -i error /Library/Ossec/logs/ossec.log">
-    <div class="cmd-desc">Check Agent Logs For Errors</div>
-    <code>sudo grep -i error /Library/Ossec/logs/ossec.log</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo /Library/Ossec/bin/agent-auth -m <MANAGER_IP>">
-    <div class="cmd-desc">Re-Register macOS Agent</div>
-    <code>sudo /Library/Ossec/bin/agent-auth -m &lt;MANAGER_IP&gt;</code>
-  </div>
-
-</div>
-  <!-- ================= LINUX AGENT REMOVAL ================= -->
-  <div class="card card-agent">
-
-    <div class="card-header">
-      <span class="material-icons">person_remove</span>
-      <h3>Linux Agent Removal</h3>
-    </div>
-
-    <div class="cmd" data-copy="sudo systemctl stop wazuh-agent">
-      <div class="cmd-desc">Stop Linux Agent Service</div>
-      <code>sudo systemctl stop wazuh-agent</code>
-    </div>
-
-    <div class="cmd" data-copy="sudo systemctl disable wazuh-agent">
-      <div class="cmd-desc">Disable Linux Agent Service</div>
-      <code>sudo systemctl disable wazuh-agent</code>
-    </div>
-
-    <div class="cmd" data-copy="sudo apt purge wazuh-agent -y">
-      <div class="cmd-desc">Remove Linux Agent Completely</div>
-      <code>sudo apt purge wazuh-agent -y</code>
-    </div>
-
-    <div class="cmd" data-copy="sudo rm -rf /var/ossec">
-      <div class="cmd-desc">Delete Residual Linux Agent Files</div>
-      <code>sudo rm -rf /var/ossec</code>
-    </div>
-
-    <div class="cmd" data-copy="sudo /var/ossec/bin/manage_agents">
-      <div class="cmd-desc">Remove Linux Agent From Server</div>
-      <code>sudo /var/ossec/bin/manage_agents</code>
-    </div>
-
-  </div>
-
- <!-- ================= WINDOWS AGENT REMOVAL ================= -->
-<div class="card card-server">
-
-  <div class="card-header">
-    <span class="material-icons">desktop_windows</span>
-    <h3>Windows Agent Removal</h3>
-  </div>
-
-  <div class="cmd" data-copy="Stop-Service -Name wazuh">
-    <div class="cmd-desc">Stop Windows Agent Service</div>
-    <code>Stop-Service -Name wazuh</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="Set-Service -Name wazuh -StartupType Disabled">
-    <div class="cmd-desc">Disable Windows Agent Service</div>
-    <code>Set-Service -Name wazuh -StartupType Disabled</code>
-  </div>
-
-  <div class="cmd"
-    data-copy='& "C:\Program Files (x86)\ossec-agent\uninstall.exe"'>
-    <div class="cmd-desc">Uninstall Windows Wazuh Agent</div>
-    <code>&amp; "C:\Program Files (x86)\ossec-agent\uninstall.exe"</code>
-  </div>
-
-  <div class="cmd"
-    data-copy='Remove-Item -Path "C:\Program Files (x86)\ossec-agent" -Recurse -Force'>
-    <div class="cmd-desc">Delete Residual Windows Agent Files</div>
-    <code>Remove-Item -Path "C:\Program Files (x86)\ossec-agent" -Recurse -Force</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sc.exe delete wazuh">
-    <div class="cmd-desc">Remove Wazuh Service Entry</div>
-    <code>sc.exe delete wazuh</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="Get-Service -Name wazuh">
-    <div class="cmd-desc">Verify Wazuh Service Removal</div>
-    <code>Get-Service -Name wazuh</code>
-  </div>
-
-  <div class="cmd"
-    data-copy='Test-Path "C:\Program Files (x86)\ossec-agent"'>
-    <div class="cmd-desc">Verify Agent Files Removal</div>
-    <code>Test-Path "C:\Program Files (x86)\ossec-agent"</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="Restart-Computer">
-    <div class="cmd-desc">Recommended Windows Reboot</div>
-    <code>Restart-Computer</code>
-  </div>
-
-</div>
-<!-- ================= MAC AGENT REMOVAL ================= -->
-<div class="card card-agent">
-
-  <div class="card-header">
-    <span class="material-icons">laptop_mac</span>
-    <h3>macOS Agent Removal</h3>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo launchctl unload /Library/LaunchDaemons/com.wazuh.agent.plist">
-    <div class="cmd-desc">Stop macOS Wazuh Agent Service</div>
-    <code>sudo launchctl unload /Library/LaunchDaemons/com.wazuh.agent.plist</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo rm -f /Library/LaunchDaemons/com.wazuh.agent.plist">
-    <div class="cmd-desc">Remove Wazuh LaunchDaemon Service</div>
-    <code>sudo rm -f /Library/LaunchDaemons/com.wazuh.agent.plist</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo /Library/Ossec/uninstall.sh">
-    <div class="cmd-desc">Run Official Wazuh Agent Uninstaller</div>
-    <code>sudo /Library/Ossec/uninstall.sh</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo rm -rf /Library/Ossec">
-    <div class="cmd-desc">Delete Residual Wazuh Agent Files</div>
-    <code>sudo rm -rf /Library/Ossec</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo pkgutil --forget com.wazuh.agent">
-    <div class="cmd-desc">Remove Wazuh Package Receipt</div>
-    <code>sudo pkgutil --forget com.wazuh.agent</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="launchctl list | grep wazuh">
-    <div class="cmd-desc">Verify Wazuh Service Removal</div>
-    <code>launchctl list | grep wazuh</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="test -d /Library/Ossec && echo 'Exists' || echo 'Removed'">
-    <div class="cmd-desc">Verify Agent Files Removal</div>
-    <code>test -d /Library/Ossec &amp;&amp; echo 'Exists' || echo 'Removed'</code>
-  </div>
-
-  <div class="cmd"
-    data-copy="sudo reboot">
-    <div class="cmd-desc">Recommended macOS Reboot</div>
-    <code>sudo reboot</code>
-  </div>
-
-</div>
-</div>
-
-</div>
   <!-- INDEXER DIAGNOSTICS (CARD PLAYBOOK STYLE) -->
   <div class="section-headline headline-server"><span class="material-icons">storage</span> Indexer Diagnostics &
     Troubleshooting (Disk/Memory)</div>
@@ -2839,8 +2926,9 @@ Quick Debug Indicators:
   </div>
 
   <!-- FORCE UNINSTALL & CLEANUP PLAYBOOK -->
-  <div class="section-headline headline-errors"><span class="material-icons">cleaning_services</span> Complete Wazuh-Server Force Removal / Force Uninstall
-     & Cleanup Guide</div>
+  <div class="section-headline headline-errors"><span class="material-icons">cleaning_services</span> Complete
+    Wazuh-Server Force Removal / Force Uninstall
+    & Cleanup Guide</div>
   <div class="grid">
     <div class="card card-clean">
       <div class="card-header"><span class="material-icons">stop_circle</span> Step 1: Stop Services & Processes</div>
@@ -2923,6 +3011,7 @@ Quick Debug Indicators:
       </div>
     </div>
   </div>
+
   <div
     style="margin-top:1rem; padding:0.8rem; background:#1a1a2a; border-radius:0.8rem; border-left:4px solid #d64545; display:flex; align-items:center; gap:0.8rem;">
     <span class="material-icons" style="color:#d64545;">backup</span>
@@ -3093,8 +3182,6 @@ Quick Debug Indicators:
       });
     }
   </script>
-
-
 
 </body>
 
